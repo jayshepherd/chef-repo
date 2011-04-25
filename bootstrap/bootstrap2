@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+#
+
+RUBY_DEPS="gcc gcc-c++ kernel-devel curl git-core autoconf screen bison zlib zlib-devel openssl-devel"
+RUBY_1_9_DEPS="${RUBY_DEPS}"
+GLOBAL_GEMS="rake bundler"
+
+# install deps
+install_deps () {
+  echo "Installing dependencies..."
+  cd /tmp
+  wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
+  rpm -ivh rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
+  cd ~
+	yum -y install $1
+  echo "Dependencies installed!"
+}
+
+install_ruby_1_9_2 () {
+  install_deps "${RUBY_1_9_DEPS}"
+
+  echo "Installing RUBY 1.9.2..."
+  cd /tmp
+  wget ftp://ftp.ruby-lang.org//pub/ruby/1.9/ruby-1.9.2-p0.tar.gz
+  tar -xvf ruby-1.9.2-p0.tar.gz
+  cd ruby-1.9.2-p0
+  ./configure --prefix=/usr
+  make
+  make install
+  cd ~
+  
+  echo "RUBY 1.9.2 installed!"
+}
+
+install_rubygems() {
+  echo "Installing RUBYGEMS..."
+  cd /tmp
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
+  tar -xvf rubygems-1.7.2.tgz
+  cd rubygems-1.7.2
+  ruby setup.rb --no-format-executable
+  cd ~
+  echo "RUBYGEMS 1.7.2 installed!"
+}
+
+install_gems () {
+  echo "Installing Gems: '$1'"
+  gem install $1
+  echo "Gems: '$1' installed!"
+}
+
+set_default_gemrc () {
+  if [ ! -e /etc/gemrc ]; then
+    echo "Setting default gemrc..."
+    cat > /etc/gemrc <<-END_OF_GEMRC
+      gem: --no-rdoc --no-ri 
+END_OF_GEMRC
+  fi
+  echo " Default gemrc set!"
+  if [ ! -e ~/.gemrc ]; then
+    echo "Setting user .gemrc..."
+    ln -s /etc/gemrc ~/.gemrc
+  fi
+  echo " User gemrc set!"
+}
+
+create_dir () {
+  if [[ ! -d "$1" ]]; then
+    echo "Creating directory $1..."
+    mkdir -p $1
+  fi
+  echo "Directory $1 created!"
+}
+
+# the main script loop
+main () {
+  echo "Here we go..."
+  #yum -y update 
+  if [ "`ruby -v | grep '1.9.2'`" == "" ]; then
+    install_ruby_1_9_2
+  else
+    echo "RUBY 1.9.2 Already Installed..."
+  fi
+  if [ "`gem -v | grep '1.7.2'`" == "" ]; then
+    install_rubygems
+  else
+    echo "RUBYGEMS 1.7.2 Already Installed..."
+  fi
+  set_default_gemrc
+  install_gems "${GLOBAL_GEMS}"
+  #install_chef
+  #setup_chef_environment
+  #set_default_ruby "1.9.2@global"
+  echo "All done!"
+}
+
+main
