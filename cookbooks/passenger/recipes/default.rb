@@ -20,7 +20,7 @@ template node[:passenger][:apache_load_path] do
   owner "root"
   group "root"
   mode 0755
-  notifies :restart, resources(:service => "httpd")
+  notifies :restart, resources(:service => "apache2")
 end
 
 template node[:passenger][:apache_conf_path] do
@@ -28,7 +28,7 @@ template node[:passenger][:apache_conf_path] do
   owner "root"
   group "root"
   mode 0755
-  notifies :restart, resources(:service => "httpd")
+  notifies :restart, resources(:service => "apache2")
 end
 
 remote_file "/usr/local/bin/passenger_monitor" do
