@@ -119,7 +119,7 @@ END_SOLO
   },
   "authorization": {
   },
-  "run_list": [ "recipe[apache2]", "recipe[passenger_apache2]" ]
+  "run_list": [ "recipe[apache2]", "recipe[passenger]" ]
 }
 END_JSON
   chown -R chef:chef /etc/chef
