@@ -101,7 +101,25 @@ json_attribs "/etc/chef/node.json"
 END_SOLO
   cat > /etc/chef/node.json <<-END_JSON
 {
-  "run_list": [ "recipe[CHANGEME]" ]
+  "apache": {
+    "listen_ports"  : [ "80" ],
+    "contact"       : "bradley@isotope11.com"
+  },
+  "passenger": {
+    "version": "3.0.7"
+  },
+  "rails": {
+    "version": "3.0.3"
+  },
+  "gems": {
+  },
+  "users": {
+  },
+  "ssh_keys": {
+  },
+  "authorization": {
+  },
+  "run_list": [ "recipe[apache2]", "recipe[passenger_apache2]" ]
 }
 END_JSON
   chown -R chef:chef /etc/chef
