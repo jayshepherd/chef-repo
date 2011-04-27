@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: redis
-# Recipe:: default
+# Recipe:: slave
 #
 # Author:: Gerhard Lazu (<gerhard.lazu@papercavalier.com>)
 #
@@ -18,5 +18,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+# TODO: support more than one master
+node.set[:redis][:slaveof] = search(:node, 'recipes:redis\:\:master').first.ec2.local_hostname
 
 include_recipe "redis::source"

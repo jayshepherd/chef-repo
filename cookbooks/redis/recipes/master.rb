@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: redis
-# Recipe:: default
+# Recipe:: master
 #
 # Author:: Gerhard Lazu (<gerhard.lazu@papercavalier.com>)
 #
@@ -18,5 +18,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+node.set[:redis][:master] = true
 
 include_recipe "redis::source"
