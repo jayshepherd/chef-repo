@@ -5,7 +5,7 @@ default.passenger[:nginx][:nginx_version] = "0.8.32"
 default.passenger[:root_path]        = "#{node[:languages][:ruby][:gems_dir]}/gems/passenger-#{passenger[:version]}"
 default.passenger[:enterprise_root_path] = "#{node[:languages][:ruby][:gems_dir]}/gems/passenger-enterprise-server-#{passenger[:nginx][:passenger_version]}"
 
-default.passenger[:module_path]      = "#{passenger[:root_path]}/ext/httpd/mod_passenger.so"
+default.passenger[:module_path]      = "#{passenger[:root_path]}/ext/apache2/mod_passenger.so"
 default.passenger[:apache_load_path] = '/etc/httpd/mods-available/passenger.load'
 default.passenger[:apache_conf_path] = '/etc/httpd/mods-available/passenger.conf'
 
