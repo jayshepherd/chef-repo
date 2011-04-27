@@ -1,7 +1,7 @@
 require_recipe "apache2"
 
 # Required to compile passenger
-package "apache2-prefork-dev"
+package "httpd-devel"
 
 gem_package "passenger" do
   action :install
