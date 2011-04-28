@@ -111,6 +111,12 @@ END_SOLO
   "rails": {
     "version": "3.0.3"
   },
+  "redis": {
+    "version": "2.2.5"
+  },
+  "mysql": {
+    "server_root_password": "password1"
+  },
   "gems": {
   },
   "users": {
