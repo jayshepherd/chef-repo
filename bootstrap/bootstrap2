@@ -14,8 +14,15 @@ install_deps () {
   cd /tmp
   wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
   rpm -ivh rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
-  cd ~
-	yum -y install $1
+
+  wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+  rpm -Uvh epel
+  cd -
+  yum clean all
+  yum clean metadata
+  yum -y update
+
+  yum -y install $1
   echo "Dependencies installed!"
 }
 
@@ -119,7 +126,7 @@ END_SOLO
   },
   "authorization": {
   },
-  "run_list": [ "recipe[apache2]", "recipe[mysql::server]", "recipe[passenger]", "recipe[rails]" ]
+  "run_list": [ "recipe[apache2]", "recipe[mysql::server]", "recipe[passenger]", "recipe[rails]", "recipe[redis]" ]
 }
 END_JSON
   chown -R chef:chef /etc/chef
@@ -144,9 +151,6 @@ create_dir () {
 # the main script loop
 main () {
   echo "Here we go..."
-  yum clean all
-  yum clean metadata
-  #yum -y update
   if [ "`ruby -v | grep '1.9.2'`" == "" ]; then
     
     install_ruby_1_9_2
