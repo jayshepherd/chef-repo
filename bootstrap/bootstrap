@@ -1,88 +1,68 @@
 #!/usr/bin/env bash
 #
 
-# RVM VARS
-RVM_DEPS="git subversion bzip2 curl"
-RVM_SCRIPT_URL=""
-RVM_SW_SCRIPT_URL="http://bit.ly/rvm-install-system-wide"
-RVM_GLOBAL_GEMS="rake bundler"
-
-# RUBY VARS
-# jruby: aptitude install curl g++ openjdk-6-jre-headless
-# ironruby: aptitude install curl mono-2.0-devel
-RUBY_DEPS="build-essential bison openssl libreadline6 libreadline6-dev curl    \
-           git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0      \
-           libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev   \
-           curl subversion"
-RUBY_1_8_DEPS="${RUBY_DEPS}"
+RUBY_DEPS="gcc gcc-c++ kernel-devel curl curl-devel git-core autoconf screen bison zlib zlib-devel openssl-devel"
 RUBY_1_9_DEPS="${RUBY_DEPS}"
-RUBY_REE_DEPS="${RUBY_DEPS}"
-
-# OS VARS
-APTITUDE="aptitude -y"
-CURL="curl -L"
+GLOBAL_GEMS="rake bundler"
 
 # CHEF VARS
-CHEF_REPO_URI="git@github.com:bramswenson/chef-repo.git"
+CHEF_REPO_URI="git@github.com:jayshepherd/chef-repo.git"
 
 # install deps
 install_deps () {
-  echo "Installing $1 dependencies..."
-	$APTITUDE install $2
-  echo "$1 dependencies installed!"
-}
-
-# install rvm system-wide
-install_rvm_system_wide () {
-  install_deps "RVM" "${RVM_DEPS}"
-  echo "Installing RVM system-wide..."
-  bash < <( $CURL $RVM_SW_SCRIPT_URL )
-  echo "RVM installed!"
-  source /usr/local/lib/rvm
-}
-
-# install ruby 1.9.2
-install_ruby () {
-  echo "Installing RUBY $1..."
-  rvm install $1
-  echo "RUBY $1 installed!"
+  echo "Installing dependencies..."
+  cd /tmp
+  wget http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
+  rpm -ivh rpmforge-release-0.5.2-2.el5.rf.x86_64.rpm
+  wget http://download.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+  rpm -Uvh epel-release-5-4.noarch.rpm
+  cd -
+  yum clean all
+  yum clean metadata
+  yum -y update
+  yum -y install $1
+  echo "Dependencies installed!"
 }
 
 install_ruby_1_9_2 () {
-  install_deps "RUBY 1.9.2" "${RUBY_1_9_DEPS}"
-  install_ruby "1.9.2"
+  install_deps "${RUBY_1_9_DEPS}"
+  echo "Installing RUBY 1.9.2..."
+  cd /tmp
+  wget ftp://ftp.ruby-lang.org//pub/ruby/1.9/ruby-1.9.2-p0.tar.gz
+  tar -xvf ruby-1.9.2-p0.tar.gz
+  cd ruby-1.9.2-p0
+  ./configure --prefix=/usr
+  make
+  make install
+  cd ~
+  echo "RUBY 1.9.2 installed!"
 }
 
-# install gems into a gemset
+install_rubygems() {
+  echo "Installing RUBYGEMS..."
+  cd /tmp
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
+  tar -xvf rubygems-1.7.2.tgz
+  cd rubygems-1.7.2
+  ruby setup.rb --no-format-executable
+  cd ~
+  echo "RUBYGEMS 1.7.2 installed!"
+}
+
 install_gems () {
-  echo "Installing '$2' into $1"
-  /usr/local/bin/rvm-shell $1 -c "gem install $2"
-  echo "'$2' installed!"
+  echo "Installing Gems: '$1'"
+  gem install $1
+  echo "Gems: '$1' installed!"
 }
 
 # add chef to global gemset
 install_chef () {
-  if [ "`/usr/local/bin/rvm-shell $1 -c 'which chef-solo'`" == "" ]; then
-    install_gems "$1" "chef"
+  if [ "`gem list chef_solo | grep 'chef'`" == "" ]; then
+    install_gems "chef ohai"
   else
     echo "CHEF Already Installed..."
   fi
 }
-
-set_default_ruby () {
-  echo "Setting default RUBY to $1..."
-  rvm use $1 --default
-  echo "Default RUBY set to $1!"
-}
-
-set_profile_loader () {
-  if [ ! -e /etc/profile.d/rvm.sh ]; then
-    echo "Setting profile loader..."
-    echo "source /usr/local/lib/rvm" > /etc/profile.d/rvm.sh
-    chmod +x /etc/profile.d/rvm.sh
-  fi
-  echo "Profile loader set!"
-} 
 
 set_default_gemrc () {
   if [ ! -e /etc/gemrc ]; then
@@ -98,14 +78,6 @@ END_OF_GEMRC
   fi
   echo " User gemrc set!"
 }
-
-create_dir () {
-  if [[ ! -d "$1" ]]; then
-    echo "Creating directory $1..."
-    mkdir -p $1
-  fi
-  echo "Directory $1 created!"
-} 
 
 create_user () {
   if [[ "`cat /etc/passwd | grep $1`" == "" ]]; then
@@ -132,12 +104,31 @@ json_attribs "/etc/chef/node.json"
 END_SOLO
   cat > /etc/chef/node.json <<-END_JSON
 {
-  "resolver": {
-    "nameservers": [ "75.127.97.6", "75.127.97.7", "8.8.8.8", "8.8.4.4" ],
-    "search":"members.linode.com",
-    "domain":"members.linode.com"
+  "apache": {
+    "listen_ports"  : [ "80" ],
+    "contact"       : "bradley@isotope11.com"
   },
-  "run_list": [ "recipe[resolver]" ]
+  "passenger": {
+    "version": "3.0.7"
+  },
+  "rails": {
+    "version": "3.0.3"
+  },
+  "redis": {
+    "version": "2.2.5"
+  },
+  "mysql": {
+    "server_root_password": "password1"
+  },
+  "gems": {
+  },
+  "users": {
+  },
+  "ssh_keys": {
+  },
+  "authorization": {
+  },
+  "run_list": [ "recipe[apache2]", "recipe[mysql::server]", "recipe[passenger]", "recipe[rails]", "recipe[redis]" ]
 }
 END_JSON
   chown -R chef:chef /etc/chef
@@ -151,27 +142,33 @@ END_JSON
   chmod ug+rwx /var/chef
 }
 
+create_dir () {
+  if [[ ! -d "$1" ]]; then
+    echo "Creating directory $1..."
+    mkdir -p $1
+  fi
+  echo "Directory $1 created!"
+}
+
 # the main script loop
 main () {
   echo "Here we go..."
-  if [ ! -d /usr/local/rvm/bin ]; then
-    install_rvm_system_wide
-  else
-    echo "RVM Already Installed..."
-  fi
-  if [ "`rvm list strings | grep '1.9.2'`" == "" ]; then
+  if [ "`ruby -v | grep '1.9.2'`" == "" ]; then
     install_ruby_1_9_2
   else
     echo "RUBY 1.9.2 Already Installed..."
   fi
+  if [ "`gem -v | grep '1.7.2'`" == "" ]; then
+    install_rubygems
+	rm -f /usr/lib/ruby/gems/1.9.1/specifications/rake.gemspec
+  else
+    echo "RUBYGEMS 1.7.2 Already Installed..."
+  fi
   set_default_gemrc
-  set_profile_loader
-  install_gems "1.9.2@global" "${RVM_GLOBAL_GEMS}"
-  install_chef "1.9.2@global"
+  install_gems "${GLOBAL_GEMS}"
+  install_chef
   setup_chef_environment
-  set_default_ruby "1.9.2@global"
   echo "All done!"
 }
 
 main
-
