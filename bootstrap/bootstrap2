@@ -119,7 +119,7 @@ END_SOLO
   },
   "authorization": {
   },
-  "run_list": [ "recipe[apache2]", "recipe[mysql::server]", "recipe[redis]", "recipe[passenger]" ]
+  "run_list": [ "recipe[apache2]", "recipe[mysql::server]", "recipe[passenger]", "recipe[rails]" ]
 }
 END_JSON
   chown -R chef:chef /etc/chef
@@ -155,6 +155,7 @@ main () {
   fi
   if [ "`gem -v | grep '1.7.2'`" == "" ]; then
     install_rubygems
+	rm -f /usr/lib/ruby/gems/1.9.1/specifications/rake.gemspec
   else
     echo "RUBYGEMS 1.7.2 Already Installed..."
   fi
