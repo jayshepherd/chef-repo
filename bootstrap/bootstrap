@@ -114,6 +114,12 @@ END_SOLO
   "mysql": {
     "server_root_password": "password1"
   },
+  "tandem": {
+    "repo" : "git@github.com:bradleyisotope/potsdam.git" 
+  },
+  "tandem_ac": {
+    "repo" : "git@github.com:bradleyisotope/potsdam_ac.git"
+  },
   "gems": {
   },
   "users": {
