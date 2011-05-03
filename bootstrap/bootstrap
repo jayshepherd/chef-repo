@@ -28,24 +28,18 @@ install_ruby_1_9_2 () {
   install_deps "${RUBY_1_9_DEPS}"
   echo "Installing RUBY 1.9.2..."
   cd /tmp
-  wget ftp://ftp.ruby-lang.org//pub/ruby/1.9/ruby-1.9.2-p0.tar.gz
-  tar -xvf ruby-1.9.2-p0.tar.gz
-  cd ruby-1.9.2-p0
-  ./configure --prefix=/usr
-  make
-  make install
-  cd ~
+  wget --no-check-certificate https://github.com/downloads/jayshepherd/ruby-1.9.2-rpm/ruby-1.9.2p0-1.x86_64.rpm
+  rpm -Uvh ruby-1.9.2p0-1.x86_64.rpm
+  cd -
   echo "RUBY 1.9.2 installed!"
 }
 
 install_rubygems() {
-  echo "Installing RUBYGEMS..."
+  echo "Updating RUBYGEMS..."
   cd /tmp
-  wget http://production.cf.rubygems.org/rubygems/rubygems-1.7.2.tgz
-  tar -xvf rubygems-1.7.2.tgz
-  cd rubygems-1.7.2
-  ruby setup.rb --no-format-executable
-  cd ~
+  gem install rubygems-update -v=1.7.2
+  update_rubygems
+  cd -
   echo "RUBYGEMS 1.7.2 installed!"
 }
 
