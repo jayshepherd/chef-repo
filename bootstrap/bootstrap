@@ -2,7 +2,8 @@
 #
 
 #RUBY_DEPS="gcc gcc-c++ kernel-devel curl curl-devel git-core autoconf screen bison zlib zlib-devel openssl-devel"
-RUBY_DEPS="curl git-core autoconf screen bison zlib"
+#RUBY_DEPS="curl git-core autoconf screen bison zlib"
+RUBY_DEPS="gcc gcc-c++ kernel-devel curl curl-devel git-core autoconf screen bison zlib zlib-devel openssl-devel"
 GLOBAL_GEMS="rake bundler"
 RUBYGEM_VERSION="1.7.2"
 
