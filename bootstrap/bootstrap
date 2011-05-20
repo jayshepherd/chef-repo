@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
 
-RUBY_DEPS="gcc gcc-c++ kernel-devel curl curl-devel git-core autoconf screen bison zlib zlib-devel openssl-devel"
-RUBY_1_9_DEPS="${RUBY_DEPS}"
+#RUBY_DEPS="gcc gcc-c++ kernel-devel curl curl-devel git-core autoconf screen bison zlib zlib-devel openssl-devel"
+RUBY_DEPS="curl git-core autoconf screen bison zlib"
 GLOBAL_GEMS="rake bundler"
+RUBYGEM_VERSION="1.7.2"
 
 # CHEF VARS
 CHEF_REPO_URI="git@github.com:jayshepherd/chef-repo.git"
@@ -25,7 +26,7 @@ install_deps () {
 }
 
 install_ruby_1_9_2 () {
-  install_deps "${RUBY_1_9_DEPS}"
+  install_deps "${RUBY_DEPS}"
   echo "Installing RUBY 1.9.2..."
   cd /tmp
   wget --no-check-certificate https://github.com/downloads/jayshepherd/ruby-1.9.2-rpm/ruby-1.9.2p0-1.x86_64.rpm
@@ -35,12 +36,12 @@ install_ruby_1_9_2 () {
 }
 
 install_rubygems() {
-  echo "Updating RUBYGEMS..."
+  echo "Updating RUBYGEMS to $1..."
   cd /tmp
-  gem install rubygems-update -v=1.7.2
+  gem install rubygems-update -v=$1
   update_rubygems
   cd -
-  echo "RUBYGEMS 1.7.2 installed!"
+  echo "RUBYGEMS $1 installed!"
 }
 
 install_gems () {
@@ -159,7 +160,7 @@ main () {
     echo "RUBY 1.9.2 Already Installed..."
   fi
   if [ "`gem -v | grep '1.7.2'`" == "" ]; then
-    install_rubygems
+    install_rubygems "${RUBYGEM_VERSION}"
 	rm -f /usr/lib/ruby/gems/1.9.1/specifications/rake.gemspec
   else
     echo "RUBYGEMS 1.7.2 Already Installed..."
