@@ -1,3 +1,18 @@
+1) Install CentOS 5.5
+2) Disable relinux and adjust any other fundamental config as desired and reboot
+3) SCP the bootstrap from this repo to the server
+4) chmod a+x bootstrap to make it executable
+5) Run it! ./bootstrap
+
+
+
+
+
+
+
+Original Readme Below
+=====================
+
 Overview
 ========
 
